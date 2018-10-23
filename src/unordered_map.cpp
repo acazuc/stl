@@ -5,23 +5,23 @@
 #include <list>
 
 template <typename K, typename V>
-using HashMapBucket = std::list<std::pair<K, V>>;
+using unordered_map_bucket = std::list<std::pair<K, V>>;
 template <typename K, typename V>
-using HashMapBuckets = std::vector<HashMapBucket<K, V>>;
+using unordered_map_buckets = std::vector<unordered_map_bucket<K, V>>;
 
-template <typename K, typename V> class HashMap
+template <typename K, typename V> class unordered_map
 {
 
 	public:
-		HashMapBuckets<K, V> buckets;
+		unordered_map_buckets<K, V> buckets;
 		std::hash<K> hasher;
 		size_t items_count;
 		float load_factor;
-		bool place(HashMapBuckets<K, V> &buckets, std::pair<K, V> value)
+		bool place(unordered_map_buckets<K, V> &buckets, std::pair<K, V>value)
 		{
 			size_t hash = this->hasher(value.first);
-			HashMapBucket<K, V> &bucket = buckets[hash & (buckets.size() - 1)];
-			for (typename HashMapBucket<K, V>::iterator iter = bucket.begin(); iter != bucket.end(); ++iter)
+			unordered_map_bucket<K, V> &bucket = buckets[hash & (buckets.size() - 1)];
+			for (typename unordered_map_bucket<K, V>::iterator iter = bucket.begin(); iter != bucket.end(); ++iter)
 			{
 				if (iter->first == value.first)
 					return false;
@@ -54,10 +54,10 @@ template <typename K, typename V> class HashMap
 			size_t n = std::max(size_t(16), npot(size * this->load_factor));
 			if (n == this->buckets.size())
 				return;
-			HashMapBuckets<K, V> buckets_new(npot(size));
-			for (typename HashMapBuckets<K, V>::iterator iter = this->buckets.begin(); iter != this->buckets.end(); ++iter)
+			unordered_map_buckets<K, V> buckets_new(npot(size));
+			for (typename unordered_map_buckets<K, V>::iterator iter = this->buckets.begin(); iter != this->buckets.end(); ++iter)
 			{
-				for (typename HashMapBucket<K, V>::iterator iter2 = iter->begin(); iter2 != iter->end(); ++iter2)
+				for (typename unordered_map_bucket<K, V>::iterator iter2 = iter->begin(); iter2 != iter->end(); ++iter2)
 					place(buckets_new, *iter2);
 			}
 			this->buckets.swap(buckets_new);
@@ -74,8 +74,8 @@ template <typename K, typename V> class HashMap
 		V *get(K key)
 		{
 			size_t hash = this->hasher(key);
-			HashMapBucket<K, V> &bucket = buckets[hash & (buckets.size() - 1)];
-			for (typename HashMapBucket<K, V>::iterator iter = bucket.begin(); iter != bucket.end(); ++iter)
+			unordered_map_bucket<K, V> &bucket = buckets[hash & (buckets.size() - 1)];
+			for (typename unordered_map_bucket<K, V>::iterator iter = bucket.begin(); iter != bucket.end(); ++iter)
 			{
 				if (iter->first == key)
 					return &iter->second;
@@ -85,8 +85,8 @@ template <typename K, typename V> class HashMap
 		void erase(K key)
 		{
 			size_t hash = this->hasher(key);
-			HashMapBucket<K, V> &bucket = buckets[hash & (buckets.size() - 1)];
-			for (typename HashMapBucket<K, V>::iterator iter = bucket.begin(); iter != bucket.end(); ++iter)
+			unordered_map_bucket<K, V> &bucket = buckets[hash & (buckets.size() - 1)];
+			for (typename unordered_map_bucket<K, V>::iterator iter = bucket.begin(); iter != bucket.end(); ++iter)
 			{
 				if (iter->first == key)
 				{
